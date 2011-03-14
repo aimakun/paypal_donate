@@ -1,0 +1,5 @@
+Features:
+- Global settings:
+  * create dropdown selection for item name.
+  * configurable currency. (Default: USD)
+- Update Paypal form based on today's button factory.
