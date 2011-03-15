@@ -170,14 +170,14 @@ function paypal_donate_form(&$node) {
   $form['donate_options'] = array(
     '#type' => 'textarea',
     '#default_value' => variable_get('paypal_donate_options_' . $node->nid, ''),
-    '#title' => t('Global options'),
-    '#description' => t('One item per line, this would appear dropdown selection in Paypal form.'),
+    '#title' => t('Donate options'),
+    '#description' => t('One item per line, this would appear dropdown selection in Paypal form, leave blank for use default "Donation" and hide dropdown from page.'),
   );
   
   $form['donate_currency'] = array(
     '#type' => 'textfield',
     '#default_value' => variable_get('paypal_donate_currency_' . $node->nid, 'USD'),
-    '#title' => t('Global currency code'),
+    '#title' => t('Currency code'),
     '#description' => t('See currency code in !link, default: USD', array('!link' => l('Paypal Currency Codes', 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes', array('attributes' => array('target' => '_blank'))))),
   );
   

@@ -34,6 +34,9 @@ if (!empty($currency)):
     <input type="image" id="donate_button" src="https://www.paypal.com/en_GB/TH/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online.">
     <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
   </form>
+  <?php
+  if (!empty($options)):
+  ?>
   <script type="text/javascript">
     $('#paypal_donate_form').submit( function() {
       var item_names = [];
@@ -45,6 +48,9 @@ if (!empty($currency)):
       $('input[name="item_name"]').val(item_names.join(' + '));
     });
   </script>
+  <?php
+  endif;
+  ?>
 </div>
 <?php /*
   <form action="http://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
