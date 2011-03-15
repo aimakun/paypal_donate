@@ -155,26 +155,30 @@ function paypal_donate_form(&$node) {
     '#title' => t('Donation body'),
     '#default_value' => $node->body,
     '#required' => FALSE,
- 	'#weight' => 1
   );
   $form['body_filter']['format'] = filter_form($node->format);
+  
+  $form['paypal_donate'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Paypal settings'),
+    '#collapsible' => TRUE,
+  );
 
-  $form['account'] = array(
+  $form['paypal_donate']['account'] = array(
     '#type' => 'textfield',
     '#title' => t('Paypal account email'),
-    '#required' => FALSE,
+    '#required' => TRUE,
     '#default_value' => $node->paypal_account,
-    '#weight' => 2
   );
   
-  $form['donate_options'] = array(
+  $form['paypal_donate']['donate_options'] = array(
     '#type' => 'textarea',
     '#default_value' => variable_get('paypal_donate_options_' . $node->nid, ''),
     '#title' => t('Donate options'),
     '#description' => t('One item per line, this would appear dropdown selection in Paypal form, leave blank for use default "Donation" and hide dropdown from page.'),
   );
   
-  $form['donate_currency'] = array(
+  $form['paypal_donate']['donate_currency'] = array(
     '#type' => 'textfield',
     '#default_value' => variable_get('paypal_donate_currency_' . $node->nid, 'USD'),
     '#title' => t('Currency code'),
@@ -185,12 +189,11 @@ function paypal_donate_form(&$node) {
   $blocks = variable_get('paypal_donate_block', array());
   $donate_block = isset($blocks[$node->nid]) ? 1 : 0;
   
-  $form['donate_block'] = array(
+  $form['paypal_donate']['donate_block'] = array(
     '#type' => 'radios',
     '#title' => t('Create block for this page'),
     '#default_value' => $donate_block,
     '#options' => array(1 => t('Enable'), 0 => t('Disable')),
-    '#weight' => 3,
   );
   
   return $form;
@@ -232,6 +235,10 @@ function paypal_donate_insert($node) {
 function paypal_donate_update($node) {
 	if ($node->nid > 0) {
     paypal_donate_block_update($node);
+    db_query("UPDATE {paypal_donate} SET paypal_account='%s' WHERE nid='%s'", $node->account, $node->nid);
+    if (db_affected_rows() < 1) {
+      return paypal_donate_insert($node);
+    }
 		return db_query("UPDATE {paypal_donate} SET paypal_account='%s' WHERE nid='%s'", $node->account, $node->nid);
 	} else /* This else should never be executed */
   	paypal_donate_save($node);

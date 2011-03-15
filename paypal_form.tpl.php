@@ -1,10 +1,11 @@
 <?php
 // $Id: paypal_form.tpl.php,v 1.1 2010/07/15 13:09:27 johnnymast Exp $
+$form_id = 'paypal_donate_form_' . $node->nid . (isset($node->block) ? '_block' : '');
 ?>
 <div class="node_<?php print $node->nid?>">
 	 <?php print isset($node->block) ? $node->teaser : $node->body ?>
 	
-	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="paypal_donate_form">
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" class="paypal_donate_form" id="<?php print $form_id; ?>">
     <input type="hidden" name="cmd" value="_donations">
     <input type="hidden" name="business" value="<?php print $node->paypal_account ?>">
     <input type="hidden" name="lc" value="TH">
@@ -38,14 +39,18 @@ if (!empty($currency)):
   if (!empty($options)):
   ?>
   <script type="text/javascript">
-    $('#paypal_donate_form').submit( function() {
+    $('#<?php print $form_id; ?>').submit( function() {
       var item_names = [];
-      $('input[name="items"]').each( function() {
+      $('#<?php print $form_id; ?> input[name="items"]').each( function() {
         if ($(this).attr('checked')) {
           item_names.push($(this).val());
         }
       });
-      $('input[name="item_name"]').val(item_names.join(' + '));
+      
+      if (item_names.length == 0) {
+        item_names = ['Donation'];
+      }
+      $('#<?php print $form_id; ?> input[name="item_name"]').val(item_names.join(' + '));
     });
   </script>
   <?php

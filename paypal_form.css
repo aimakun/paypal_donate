@@ -1,2 +1,2 @@
-#paypal_donate_form .form-block{display:block;}
-#paypal_donate_form .form-field-label{font-weight:bold;}
+.paypal_donate_form .form-block{display:block;}
+.paypal_donate_form .form-field-label{font-weight:bold;}
