@@ -4,46 +4,48 @@
 <div class="node_<?php print $node->nid?>">
 	 <?php print $node->body ?>
 	
-	<!-- <form action="https://www.paypal.com/cgi-bin/webscr" method="post"> -->
-  <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_donations">
-<input type="hidden" name="business" value="<?php print $node->paypal_account ?>">
-<input type="hidden" name="lc" value="TH">
-<input type="hidden" name="no_note" value="1">
-<input type="hidden" name="no_shipping" value="2">
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="paypal_donate_form">
+    <input type="hidden" name="cmd" value="_donations">
+    <input type="hidden" name="business" value="<?php print $node->paypal_account ?>">
+    <input type="hidden" name="lc" value="TH">
+    <input type="hidden" name="no_note" value="1">
+    <input type="hidden" name="no_shipping" value="2">
+    <input type="hidden" id="item_name" name="item_name" value="Donation">
 <?php 
 $currency = variable_get('paypal_donate_currency', 'USD');
 if (!empty($currency)):
 ?>
-<input type="hidden" name="currency_code" value="<?php print $currency; ?>">
+    <input type="hidden" name="currency_code" value="<?php print $currency; ?>">
 <?php endif; ?>
   <?php 
   $options = variable_get('paypal_donate_options', '');
   if (!empty($options)):
-    $options = explode("\n", $options);
+    $options = explode("\r\n", $options);
   ?>
-  <div>
-  <label for="item_name"><?php print t('Donate option:'); ?></label>
-  <select name="item_name">
+    <label for="item_name" class="form-block form-field-label"><?php print t('Donate option:'); ?></label>
     <?php foreach ($options as $option) {
-      if (empty($option)) {
-        print '<option value="">-- None --</option>';
-      }
-      else {
-        print '<option value="' . check_plain($option) . '">' . check_plain($option) . '</option>';
+      if (!empty($option)) {
+        print '   <label class="form-block"><input type="checkbox" name="items" value="' . check_plain($option) . '" />' . check_plain($option) . '</label>';
       }
     }
     ?>
-  </select>
-  </div>
   <?php endif; ?>
-  
-  <input type="hidden" name="bn" value="PP-DonationsBF:btn_donateCC_LG.gif:NonHosted">
-<input type="image" src="https://www.paypal.com/en_GB/TH/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online.">
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-
-  
+    <input type="hidden" name="bn" value="PP-DonationsBF:btn_donateCC_LG.gif:NonHosted">
+    <input type="image" id="donate_button" src="https://www.paypal.com/en_GB/TH/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online.">
+    <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+  </form>
+  <script type="text/javascript">
+    $('#paypal_donate_form').submit( function() {
+      var item_names = [];
+      $('input[name="items"]').each( function() {
+        if ($(this).attr('checked')) {
+          item_names.push($(this).val());
+        }
+      });
+      $('input[name="item_name"]').val(item_names.join(' + '));
+    });
+  </script>
+</div>
 <?php /*
   <form action="http://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
 	<input type="hidden" name="cmd" value="_donations">
@@ -60,6 +62,5 @@ if (!empty($currency)):
 	<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
 	<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 	</form>
-</div>
 
 */

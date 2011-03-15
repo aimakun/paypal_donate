@@ -58,6 +58,33 @@ function paypal_donate_settings() {
   return system_settings_form($form);
 }
 
+function paypal_donate_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks = array();
+      $nodes = variable_get('paypal_donate_block', array());
+      foreach ($nodes as $nid => $isset) {
+        $node = node_load($nid);
+        $blocks[$node->nid] = array(
+          'info' => 'Paypal: ' . $node->title,
+        );
+      }
+      return $blocks;
+      break;
+      
+    case 'view':
+      $nodes = variable_get('paypal_donate_block', array());
+      if (isset($nodes[$delta])) {
+        $node = node_load($delta);
+        drupal_add_css(drupal_get_path('module', 'paypal_donate') . '/paypal_form.css');
+        return array(
+          'subject' => $node->title,
+          'content' => theme('paypal_form', $node),
+        );
+      }
+  }
+}
+
 /**
  * Returns a list of permissions that can be used for this module.
  * 
@@ -125,6 +152,7 @@ function paypal_donate_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 	if (user_access('access content')) {
 		if ($op == 'alter') {
 			if ($node->type == 'paypal_page') {
+        drupal_add_css(drupal_get_path('module', 'paypal_donate') . '/paypal_form.css');
 				$node->body = theme('paypal_form', $node);
 				return NULL;
 			}
@@ -167,6 +195,18 @@ function paypal_donate_form(&$node) {
     '#default_value' => $node->paypal_account,
     '#weight' => 2
   );
+  
+  // Get array of block variable.
+  $blocks = variable_get('paypal_donate_block', array());
+  $donate_block = isset($blocks[$node->nid]) ? 1 : 0;
+  
+  $form['donate_block'] = array(
+    '#type' => 'radios',
+    '#title' => t('Create block for this page'),
+    '#default_value' => $donate_block,
+    '#options' => array(1 => t('Enable'), 0 => t('Disable')),
+  );
+  
   return $form;
 }
 
@@ -191,6 +231,7 @@ function paypal_donate_load($node) {
 * @return void
 */
 function paypal_donate_insert($node) {
+  paypal_donate_block_update($node);
   return db_query("INSERT INTO {paypal_donate} SET nid='%s', paypal_account='%s'", $node->nid, $node->account);
 }
 
@@ -204,6 +245,7 @@ function paypal_donate_insert($node) {
 */
 function paypal_donate_update($node) {
 	if ($node->nid > 0) {
+    paypal_donate_block_update($node);
 		return db_query("UPDATE {paypal_donate} SET paypal_account='%s' WHERE nid='%s'", $node->account, $node->nid);
 	} else /* This else should never be executed */
   	paypal_donate_save($node);
@@ -221,4 +263,17 @@ function paypal_donate_delete($node) {
 	if ($node->nid > 0) {
 		return db_query("DELETE FROM {paypal_donate} WHERE nid='%s'", $node->nid);
 	}
+}
+
+function paypal_donate_block_update($node) {
+  if ($node->donate_block) {
+    $blocks = variable_get('paypal_donate_block', array());
+    if ($node->donate_block == 1) {
+      $blocks[$node->nid] = TRUE;
+    }
+    else {
+      unset($blocks[$node->nid]);
+    }
+    variable_set('paypal_donate_block', $blocks);
+  }
 }
