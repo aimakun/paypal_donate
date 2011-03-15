@@ -1,5 +1,26 @@
-Features:
-- Global settings:
-  * create dropdown selection for item name.
-  * configurable currency. (Default: USD)
-- Update Paypal form based on today's button factory.
+Improved features:
+===========================================================
+- Dropdown selection for item name.
+- Configurable currency. (Default: USD)
+- Block integrations (with node teaser)
+
+
+Fix issues:
+===========================================================
+- Update PayPal form based on today's button factory, now you could try out this module with PayPal Sandbox too. (Edit paypal_form.tpl.php by replace domain "www.paypal.com" with "www.sandbox.paypal.com" overall file).
+- Compatiblility with wysiwyg module.
+
+
+Unicode input support:
+===========================================================
+It depend on your PayPal account profiles, follow these steps:
+
+1. Log into your PayPal account at https://www.paypal.com
+2. Click the Profile link
+3. Click the 'Language Encoding' link under the Selling Preferences column
+4. Click the grey 'More Options' button
+5. Choose "UTF-8" from the Encoding drop down menu
+6. Select "Yes"' for "Do you want to use the same encoding for data sent from
+PayPal to you (e.g., IPN, downloadable logs, emails)?"
+7. Click "Save"
+

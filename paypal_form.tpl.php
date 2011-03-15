@@ -2,7 +2,7 @@
 // $Id: paypal_form.tpl.php,v 1.1 2010/07/15 13:09:27 johnnymast Exp $
 ?>
 <div class="node_<?php print $node->nid?>">
-	 <?php print $node->body ?>
+	 <?php print isset($node->block) ? $node->teaser : $node->body ?>
 	
 	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" id="paypal_donate_form">
     <input type="hidden" name="cmd" value="_donations">
@@ -12,13 +12,13 @@
     <input type="hidden" name="no_shipping" value="2">
     <input type="hidden" id="item_name" name="item_name" value="Donation">
 <?php 
-$currency = variable_get('paypal_donate_currency', 'USD');
+$currency = variable_get('paypal_donate_currency_' . $node->nid, 'USD');
 if (!empty($currency)):
 ?>
     <input type="hidden" name="currency_code" value="<?php print $currency; ?>">
 <?php endif; ?>
   <?php 
-  $options = variable_get('paypal_donate_options', '');
+  $options = variable_get('paypal_donate_options_' . $node->nid, '');
   if (!empty($options)):
     $options = explode("\r\n", $options);
   ?>

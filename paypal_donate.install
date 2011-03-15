@@ -55,6 +55,10 @@ function paypal_donate_schema() {
 function paypal_donate_uninstall() {
   drupal_uninstall_schema('paypal_donate');
 	
+  // Clear per-node variables & blocks.
+  db_query("DELETE FROM {variable} WHERE name LIKE 'paypal_donate_%'");
+  db_query("DELETE FROM {blocks} WHERE module = 'paypal_donate'");
+  
   /**
   * As in version 1.1 i leave the 'paypal_donate_version' in the database because
   * it might happen that a user would like to decide to update a newer version of the 

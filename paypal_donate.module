@@ -26,38 +26,8 @@ function paypal_donate_node_info() {
 }
 
 /**
- * Implementation of hook_menu()
+ * Implementation of hook_block()
  */
-function paypal_donate_menu() {
-  return array(
-    'admin/settings/paypal_donate' => array(
-      'title' => t('Paypal donate global settings'),
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('paypal_donate_settings'),
-      'access arguments' => array('administer nodes'),
-      'type' => MENU_NORMAL_ITEM,
-    ),
-  );
-}
-
-function paypal_donate_settings() {
-  $form['paypal_donate_options'] = array(
-    '#type' => 'textarea',
-    '#default_value' => variable_get('paypal_donate_options', ''),
-    '#title' => t('Global options'),
-    '#description' => t('One item per line, this would appear dropdown selection in Paypal form.'),
-  );
-  
-  $form['paypal_donate_currency'] = array(
-    '#type' => 'textfield',
-    '#default_value' => variable_get('paypal_donate_currency', ''),
-    '#title' => t('Global currency code'),
-    '#description' => t('See currency code in !link, default: USD', array('!link' => l('Paypal Currency Codes', 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes', array('attributes' => array('target' => '_blank'))))),
-  );
-  
-  return system_settings_form($form);
-}
-
 function paypal_donate_block($op = 'list', $delta = 0, $edit = array()) {
   switch ($op) {
     case 'list':
@@ -76,6 +46,7 @@ function paypal_donate_block($op = 'list', $delta = 0, $edit = array()) {
       $nodes = variable_get('paypal_donate_block', array());
       if (isset($nodes[$delta])) {
         $node = node_load($delta);
+        $node->block = TRUE;
         drupal_add_css(drupal_get_path('module', 'paypal_donate') . '/paypal_form.css');
         return array(
           'subject' => $node->title,
@@ -196,6 +167,20 @@ function paypal_donate_form(&$node) {
     '#weight' => 2
   );
   
+  $form['donate_options'] = array(
+    '#type' => 'textarea',
+    '#default_value' => variable_get('paypal_donate_options_' . $node->nid, ''),
+    '#title' => t('Global options'),
+    '#description' => t('One item per line, this would appear dropdown selection in Paypal form.'),
+  );
+  
+  $form['donate_currency'] = array(
+    '#type' => 'textfield',
+    '#default_value' => variable_get('paypal_donate_currency_' . $node->nid, 'USD'),
+    '#title' => t('Global currency code'),
+    '#description' => t('See currency code in !link, default: USD', array('!link' => l('Paypal Currency Codes', 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes', array('attributes' => array('target' => '_blank'))))),
+  );
+  
   // Get array of block variable.
   $blocks = variable_get('paypal_donate_block', array());
   $donate_block = isset($blocks[$node->nid]) ? 1 : 0;
@@ -277,5 +262,13 @@ function paypal_donate_block_update($node) {
       unset($blocks[$node->nid]);
     }
     variable_set('paypal_donate_block', $blocks);
+  }
+  
+  if (isset($node->donate_options)) {
+    variable_set('paypal_donate_options_' . $node->nid, $node->donate_options);
+  }
+  
+  if (isset($node->donate_currency)) {
+    variable_set('paypal_donate_currency_' . $node->nid, $node->donate_currency);
   }
 }
