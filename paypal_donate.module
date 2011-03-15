@@ -186,7 +186,7 @@ function paypal_donate_form(&$node) {
     '#required' => FALSE,
  	'#weight' => 1
   );
-  $form['body_filter']['filter'] = filter_form($node->format);
+  $form['body_filter']['format'] = filter_form($node->format);
 
   $form['account'] = array(
     '#type' => 'textfield',
@@ -205,6 +205,7 @@ function paypal_donate_form(&$node) {
     '#title' => t('Create block for this page'),
     '#default_value' => $donate_block,
     '#options' => array(1 => t('Enable'), 0 => t('Disable')),
+    '#weight' => 3,
   );
   
   return $form;
@@ -266,8 +267,9 @@ function paypal_donate_delete($node) {
 }
 
 function paypal_donate_block_update($node) {
-  if ($node->donate_block) {
+  if (isset($node->donate_block)) {
     $blocks = variable_get('paypal_donate_block', array());
+    
     if ($node->donate_block == 1) {
       $blocks[$node->nid] = TRUE;
     }
