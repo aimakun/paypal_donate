@@ -41,7 +41,14 @@ function paypal_donate_block($op = 'list', $delta = 0, $edit = array()) {
       }
       return $blocks;
       break;
+    case 'configure':
+      $form['paypal_donate']['node_link'] = array(
+        '#type' => 'item',
+        '#title' => t('Paypal donate'),
+        '#value' => '<div>' . t('To edit any paypal settings, go to !node_edit', array('!node_edit' => l(t('this node edit page'), 'node/' . arg(5) . '/edit'))) . '</div>',
+      );
       
+      return $form;
     case 'view':
       $nodes = variable_get('paypal_donate_block', array());
       if (isset($nodes[$delta])) {
@@ -195,6 +202,10 @@ function paypal_donate_form(&$node) {
     '#default_value' => $donate_block,
     '#options' => array(1 => t('Enable'), 0 => t('Disable')),
   );
+  
+  if (user_access('administer blocks')) {
+    $form['paypal_donate']['donate_block']['#description'] = t('for edit block settings, go to !block_link', array('!block_link' => l(t('block configure page'), 'admin/build/block/configure/paypal_donate/' . arg(1))));
+  }
   
   return $form;
 }
